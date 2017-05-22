@@ -26,26 +26,20 @@ container {
 ground {
     background-image: url("../images/floor.jpg");
     background-repeat: repeat;
-    width: 300vw; height: 15%;
     z-index: -9;
 }
 
 catapult {
     background-image: url("../images/catapult.png");
-    width: 100%; height: 100%;
     z-index: 1;
 }
 
 character {
     background-image: url("../images/character.png");
-    width:70px;
-    height:70px;
     background-size: cover;
 }
 
 background {
-    width: 300vw;
-    height: 100%;
     background-image: url("../images/background.jpg");
     background-repeat: repeat-x;
     z-index: -10;

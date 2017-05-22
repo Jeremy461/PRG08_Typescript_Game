@@ -24,17 +24,18 @@ class Flying implements CharacterStates {
         if(this.character.x >= 400){
             this.game.background.move();            
             this.character.velocityX = 0;
-        }
+        };
         
-        this.character.div.style.transform = "translate("+ this.character.x +"px, "+ this.character.y +"px)";
-        if (this.character.y >= 600) {
+        if(Utils.checkCollision(this.character, this.game.ground)){
             this.character.state = new Crashed(this.character);
             this.game.background.stop();
-        }
+        };
+        
+        this.character.div.style.transform = "translate("+ this.character.x +"px, "+ this.character.y +"px)";
         
     };
     
     private onClick(): void{
         this.character.velocityY = -15;
-    }
-}
+    };
+};

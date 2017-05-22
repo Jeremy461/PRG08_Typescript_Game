@@ -4,50 +4,63 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var GameObject = (function () {
-    function GameObject(tag, parent, x, y) {
+    function GameObject(tag, parent, x, y, width, height) {
         this.div = document.createElement(tag);
         parent.appendChild(this.div);
+        this.div.style.width = width + "px";
+        this.div.style.height = height + "px";
         this.div.style.transform = "translate(" + x + "px, " + y + "px)";
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
     }
+    ;
     return GameObject;
 }());
+;
 var Background = (function (_super) {
     __extends(Background, _super);
     function Background(c) {
-        _super.call(this, "background", document.getElementById("container"), 0, 0);
+        _super.call(this, "background", document.getElementById("container"), 0, 0, 10000, 720);
         this.div.setAttribute("id", "background");
         this.character = c;
     }
+    ;
     Background.prototype.move = function () {
         this.x -= 10;
         this.div.style.transform = "translateX(" + this.x + "px)";
     };
+    ;
     Background.prototype.stop = function () {
         this.div.style.transform = "translateX(" + this.x + "px)";
     };
+    ;
     return Background;
 }(GameObject));
+;
 var Catapult = (function (_super) {
     __extends(Catapult, _super);
     function Catapult(c) {
         var _this = this;
-        _super.call(this, "catapult", document.getElementById("background"), 0, 480);
+        _super.call(this, "catapult", document.getElementById("background"), 0, 480, 400, 200);
         this.character = c;
         this.click = function () { return _this.onClick(); };
         this.div.addEventListener("click", this.click);
     }
+    ;
     Catapult.prototype.onClick = function () {
         this.character.state = new Flying(this.character);
         this.div.removeEventListener("click", this.click);
     };
+    ;
     return Catapult;
 }(GameObject));
+;
 var Character = (function (_super) {
     __extends(Character, _super);
     function Character() {
-        _super.call(this, "character", document.getElementById("container"), 20, 520);
+        _super.call(this, "character", document.getElementById("container"), 20, 520, 70, 70);
         this.speed = 0;
         this.gravity = 0.5;
         this.speed = 3;
@@ -55,11 +68,15 @@ var Character = (function (_super) {
         this.y = 520;
         this.state = new Stationary(this);
     }
+    ;
     Character.prototype.move = function () {
         this.state.move();
     };
+    ;
     return Character;
 }(GameObject));
+;
+;
 var Crashed = (function () {
     function Crashed(c) {
         this.character = c;
@@ -72,6 +89,7 @@ var Crashed = (function () {
     ;
     return Crashed;
 }());
+;
 var Flying = (function () {
     function Flying(c) {
         var _this = this;
@@ -92,25 +110,31 @@ var Flying = (function () {
             this.game.background.move();
             this.character.velocityX = 0;
         }
-        this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
-        if (this.character.y >= 600) {
+        ;
+        if (Utils.checkCollision(this.character, this.game.ground)) {
             this.character.state = new Crashed(this.character);
             this.game.background.stop();
         }
+        ;
+        this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
     };
     ;
     Flying.prototype.onClick = function () {
         this.character.velocityY = -15;
     };
+    ;
     return Flying;
 }());
+;
 var Ground = (function (_super) {
     __extends(Ground, _super);
     function Ground() {
-        _super.call(this, "ground", document.getElementById("background"), 0, 615);
+        _super.call(this, "ground", document.getElementById("background"), 0, 615, 10000, 108);
     }
+    ;
     return Ground;
 }(GameObject));
+;
 var Game = (function () {
     function Game() {
         var _this = this;
@@ -133,9 +157,11 @@ var Game = (function () {
         }
         return Game.instance;
     };
+    ;
     Game.prototype.gameOver = function () {
         console.log("game over");
     };
+    ;
     return Game;
 }());
 ;
@@ -146,9 +172,24 @@ var Stationary = (function () {
     function Stationary(c) {
         this.character = c;
     }
+    ;
     Stationary.prototype.move = function () {
     };
     ;
     return Stationary;
+}());
+var Utils = (function () {
+    function Utils() {
+    }
+    Utils.checkCollision = function (n, m) {
+        return (n.x < m.x + m.width &&
+            n.x + n.width > m.x &&
+            n.y < m.y + m.height &&
+            n.height + n.y > m.y);
+    };
+    Utils.getRandom = function (min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    };
+    return Utils;
 }());
 //# sourceMappingURL=main.js.map

@@ -1,3 +1,3 @@
 interface CharacterStates {
     move(): void;
-}
+};

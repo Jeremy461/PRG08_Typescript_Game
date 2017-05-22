@@ -3,8 +3,8 @@
 
 class Game {
     
-    private ground: Ground;
-    private catapult: Catapult;
+    public ground: Ground;
+    public catapult: Catapult;
     private character: Character;
     public background: Background;
     
@@ -29,11 +29,11 @@ class Game {
             Game.instance = new Game();
         }
         return Game.instance;
-    }
+    };
     
     public gameOver(){
         console.log("game over");
-    }
+    };
    
 }; 
 

@@ -10,4 +10,4 @@ class Crashed implements CharacterStates {
         let g = Game.getInstance();
         g.gameOver();
     };
-}
+};
