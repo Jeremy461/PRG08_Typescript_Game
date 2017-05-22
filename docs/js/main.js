@@ -8,29 +8,51 @@ var GameObject = (function () {
         this.div = document.createElement(tag);
         parent.appendChild(this.div);
         this.div.style.transform = "translate(" + x + "px, " + y + "px)";
+        this.x = x;
+        this.y = y;
     }
     return GameObject;
 }());
+var Background = (function (_super) {
+    __extends(Background, _super);
+    function Background(c) {
+        _super.call(this, "background", document.getElementById("container"), 0, 0);
+        this.div.setAttribute("id", "background");
+        this.character = c;
+    }
+    Background.prototype.move = function () {
+        console.log(this.x);
+        this.x -= 10;
+        this.div.style.transform = "translateX(" + this.x + "px)";
+    };
+    return Background;
+}(GameObject));
 var Catapult = (function (_super) {
     __extends(Catapult, _super);
     function Catapult(g, c) {
-        _super.call(this, "catapult", document.getElementById("container"), 0, 480);
+        var _this = this;
+        _super.call(this, "catapult", document.getElementById("background"), 0, 480);
         this.game = g;
         this.character = c;
-        this.div.addEventListener("click", this.onClick);
+        this.click = function () { return _this.onClick(); };
+        this.div.addEventListener("click", this.click);
     }
     Catapult.prototype.onClick = function () {
-        console.log(this.character);
-        this.character.state = new Flying(this.character);
+        this.character.state = new Flying(this.character, this.game);
+        this.div.removeEventListener("click", this.click);
     };
     return Catapult;
 }(GameObject));
 var Character = (function (_super) {
     __extends(Character, _super);
-    function Character() {
+    function Character(g) {
         _super.call(this, "character", document.getElementById("container"), 20, 520);
+        this.speed = 0;
+        this.gravity = 0.5;
         this.speed = 3;
         this.x = 20;
+        this.y = 520;
+        this.game = g;
         this.state = new Stationary(this);
     }
     Character.prototype.move = function () {
@@ -45,43 +67,67 @@ var Crashed = (function () {
     function Crashed(c) {
         this.character = c;
     }
+    ;
     Crashed.prototype.move = function () {
     };
     ;
     return Crashed;
 }());
 var Flying = (function () {
-    function Flying(c) {
+    function Flying(c, g) {
+        var _this = this;
         this.character = c;
+        this.game = g;
+        this.character.velocityY = -15;
+        this.character.velocityX = 10;
+        var container = document.getElementById("container");
+        this.click = function () { return _this.onClick(); };
+        container.addEventListener("click", this.click);
     }
+    ;
     Flying.prototype.move = function () {
-        console.log("flying");
+        this.character.x += this.character.velocityX;
+        this.character.y += this.character.velocityY;
+        this.character.velocityY += this.character.gravity;
+        if (this.character.x >= 400) {
+            this.game.background.move();
+            this.character.velocityX = 0;
+        }
+        this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
     };
     ;
+    Flying.prototype.onClick = function () {
+        console.log("click");
+        this.character.velocityY = -15;
+    };
     return Flying;
 }());
 var Ground = (function (_super) {
     __extends(Ground, _super);
     function Ground() {
-        _super.call(this, "ground", document.getElementById("container"), 0, 615);
+        _super.call(this, "ground", document.getElementById("background"), 0, 615);
     }
     return Ground;
 }(GameObject));
 var Game = (function () {
     function Game() {
         var _this = this;
+        this.character = new Character(this);
+        this.background = new Background(this.character);
         this.ground = new Ground();
-        this.character = new Character();
         this.catapult = new Catapult(this, this.character);
         requestAnimationFrame(function () { return _this.gameLoop(); });
     }
+    ;
     Game.prototype.gameLoop = function () {
         var _this = this;
         this.character.move();
         requestAnimationFrame(function () { return _this.gameLoop(); });
     };
+    ;
     return Game;
 }());
+;
 window.addEventListener("load", function () {
     new Game();
 });
@@ -90,7 +136,6 @@ var Stationary = (function () {
         this.character = c;
     }
     Stationary.prototype.move = function () {
-        console.log("test");
     };
     ;
     return Stationary;

@@ -7,6 +7,6 @@ class Stationary implements CharacterStates {
     }
     
     public move(): void{
-        console.log("test");
+        
     };
 }

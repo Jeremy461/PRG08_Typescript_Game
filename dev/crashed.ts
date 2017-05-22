@@ -4,7 +4,7 @@ class Crashed implements CharacterStates {
     
     constructor(c: Character) {
         this.character = c;
-    }
+    };
     
     public move(): void{
         
