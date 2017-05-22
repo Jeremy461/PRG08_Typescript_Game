@@ -21,8 +21,10 @@ var Background = (function (_super) {
         this.character = c;
     }
     Background.prototype.move = function () {
-        console.log(this.x);
         this.x -= 10;
+        this.div.style.transform = "translateX(" + this.x + "px)";
+    };
+    Background.prototype.stop = function () {
         this.div.style.transform = "translateX(" + this.x + "px)";
     };
     return Background;
@@ -69,6 +71,7 @@ var Crashed = (function () {
     }
     ;
     Crashed.prototype.move = function () {
+        console.log("game over");
     };
     ;
     return Crashed;
@@ -94,10 +97,13 @@ var Flying = (function () {
             this.character.velocityX = 0;
         }
         this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
+        if (this.character.y >= 600) {
+            this.character.state = new Crashed(this.character);
+            this.game.background.stop();
+        }
     };
     ;
     Flying.prototype.onClick = function () {
-        console.log("click");
         this.character.velocityY = -15;
     };
     return Flying;

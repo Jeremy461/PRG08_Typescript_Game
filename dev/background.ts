@@ -12,9 +12,12 @@ class Background extends GameObject {
     }
     
     public move(): void{
-        console.log(this.x);
         this.x -= 10;
-        this.div.style.transform = "translateX("+ this.x +"px)"
+        this.div.style.transform = "translateX("+ this.x +"px)";
+    }
+    
+    public stop(): void{
+        this.div.style.transform = "translateX("+ this.x +"px)";
     }
     
 }

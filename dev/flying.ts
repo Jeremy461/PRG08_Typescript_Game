@@ -27,10 +27,13 @@ class Flying implements CharacterStates {
         }
         
         this.character.div.style.transform = "translate("+ this.character.x +"px, "+ this.character.y +"px)";
+        if (this.character.y >= 600) {
+            this.character.state = new Crashed(this.character);
+            this.game.background.stop();
+        }
     };
     
     private onClick(): void{
-        console.log("click");
         this.character.velocityY = -15;
     }
 }

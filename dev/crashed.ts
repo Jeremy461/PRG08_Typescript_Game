@@ -7,6 +7,6 @@ class Crashed implements CharacterStates {
     };
     
     public move(): void{
-        
+        console.log("game over");
     };
 }
