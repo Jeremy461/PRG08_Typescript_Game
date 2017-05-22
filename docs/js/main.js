@@ -31,36 +31,31 @@ var Background = (function (_super) {
 }(GameObject));
 var Catapult = (function (_super) {
     __extends(Catapult, _super);
-    function Catapult(g, c) {
+    function Catapult(c) {
         var _this = this;
         _super.call(this, "catapult", document.getElementById("background"), 0, 480);
-        this.game = g;
         this.character = c;
         this.click = function () { return _this.onClick(); };
         this.div.addEventListener("click", this.click);
     }
     Catapult.prototype.onClick = function () {
-        this.character.state = new Flying(this.character, this.game);
+        this.character.state = new Flying(this.character);
         this.div.removeEventListener("click", this.click);
     };
     return Catapult;
 }(GameObject));
 var Character = (function (_super) {
     __extends(Character, _super);
-    function Character(g) {
+    function Character() {
         _super.call(this, "character", document.getElementById("container"), 20, 520);
         this.speed = 0;
         this.gravity = 0.5;
         this.speed = 3;
         this.x = 20;
         this.y = 520;
-        this.game = g;
         this.state = new Stationary(this);
     }
     Character.prototype.move = function () {
-        this.state.move();
-    };
-    Character.prototype.update = function () {
         this.state.move();
     };
     return Character;
@@ -71,16 +66,17 @@ var Crashed = (function () {
     }
     ;
     Crashed.prototype.move = function () {
-        console.log("game over");
+        var g = Game.getInstance();
+        g.gameOver();
     };
     ;
     return Crashed;
 }());
 var Flying = (function () {
-    function Flying(c, g) {
+    function Flying(c) {
         var _this = this;
         this.character = c;
-        this.game = g;
+        this.game = Game.getInstance();
         this.character.velocityY = -15;
         this.character.velocityX = 10;
         var container = document.getElementById("container");
@@ -118,10 +114,10 @@ var Ground = (function (_super) {
 var Game = (function () {
     function Game() {
         var _this = this;
-        this.character = new Character(this);
+        this.character = new Character();
         this.background = new Background(this.character);
         this.ground = new Ground();
-        this.catapult = new Catapult(this, this.character);
+        this.catapult = new Catapult(this.character);
         requestAnimationFrame(function () { return _this.gameLoop(); });
     }
     ;
@@ -131,11 +127,20 @@ var Game = (function () {
         requestAnimationFrame(function () { return _this.gameLoop(); });
     };
     ;
+    Game.getInstance = function () {
+        if (!Game.instance) {
+            Game.instance = new Game();
+        }
+        return Game.instance;
+    };
+    Game.prototype.gameOver = function () {
+        console.log("game over");
+    };
     return Game;
 }());
 ;
 window.addEventListener("load", function () {
-    new Game();
+    var g = Game.getInstance();
 });
 var Stationary = (function () {
     function Stationary(c) {

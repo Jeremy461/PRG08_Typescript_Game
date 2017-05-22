@@ -1,12 +1,13 @@
 class Crashed implements CharacterStates {
     
-    character: Character;
+    private character: Character;
     
     constructor(c: Character) {
         this.character = c;
     };
     
     public move(): void{
-        console.log("game over");
+        let g = Game.getInstance();
+        g.gameOver();
     };
 }

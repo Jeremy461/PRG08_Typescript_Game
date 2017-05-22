@@ -8,11 +8,13 @@ class Game {
     private character: Character;
     public background: Background;
     
+    private static instance: Game;
+    
     constructor() {
-        this.character = new Character(this);
+        this.character = new Character();
         this.background = new Background(this.character);
         this.ground = new Ground();
-        this.catapult = new Catapult(this, this.character);
+        this.catapult = new Catapult(this.character);
         
         requestAnimationFrame(() => this.gameLoop());
     };
@@ -21,10 +23,22 @@ class Game {
         this.character.move();
         requestAnimationFrame(() => this.gameLoop());
     };
+    
+    public static getInstance() {
+        if (!Game.instance) {
+            Game.instance = new Game();
+        }
+        return Game.instance;
+    }
+    
+    public gameOver(){
+        console.log("game over");
+    }
+   
 }; 
 
 
 // load
 window.addEventListener("load", function() {
-    new Game();
+    let g = Game.getInstance();
 });

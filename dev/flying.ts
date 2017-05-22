@@ -1,12 +1,13 @@
 class Flying implements CharacterStates {
     
     private character: Character;
-    private game: Game;
     private click: EventListener;
+    private game: Game;
     
-    constructor(c: Character, g: Game) {
+    constructor(c: Character) {
+        
         this.character = c;
-        this.game = g;
+        this.game = Game.getInstance();
         this.character.velocityY = -15;
         this.character.velocityX = 10;
         
@@ -21,8 +22,7 @@ class Flying implements CharacterStates {
         this.character.velocityY += this.character.gravity;
         
         if(this.character.x >= 400){
-            this.game.background.move();
-            
+            this.game.background.move();            
             this.character.velocityX = 0;
         }
         
@@ -31,6 +31,7 @@ class Flying implements CharacterStates {
             this.character.state = new Crashed(this.character);
             this.game.background.stop();
         }
+        
     };
     
     private onClick(): void{
