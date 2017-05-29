@@ -1,6 +1,6 @@
 class Stationary implements CharacterStates {
     
-    private character: Character;
+    public character: Character;
     
     constructor(c: Character) {
         this.character = c;

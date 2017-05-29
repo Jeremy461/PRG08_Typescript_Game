@@ -1,6 +1,6 @@
 class Flying implements CharacterStates {
     
-    private character: Character;
+    public character: Character;
     private click: EventListener;
     private game: Game;
     
