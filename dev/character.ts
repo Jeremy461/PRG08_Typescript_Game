@@ -1,15 +1,18 @@
 /// <reference path="gameobject.ts" />
 
 
-class Character extends GameObject {
+class Character extends GameObject implements Subject {
     
+    public observers:Array<Observer> = new Array<Observer>();
+
     public speed: number = 0;
     public state: CharacterStates;
     public gravity: number = 0.5;
     public velocityY: number; public velocityX: number;
+    public fuel: number = 10;
     
     constructor(){
-        super("character", document.getElementById("container"), 20, 520, 70, 70);
+        super("character", document.getElementById("container"), 20, 495, 70, 70);
         
         this.speed = 3;
         this.x = 20;
@@ -21,5 +24,13 @@ class Character extends GameObject {
     public move(): void{
         this.state.move();
     };
+
+    public subscribe(o:Observer): void{
+        this.observers.push(o); 
+    }
+
+    public unsubscribe(o:Observer): void{
+
+    }
     
 };

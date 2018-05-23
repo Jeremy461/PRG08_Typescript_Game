@@ -7,7 +7,7 @@ class Catapult extends GameObject {
     private click: EventListener;
     
     constructor(c: Character){
-        super("catapult", document.getElementById("background"), 0, 480, 400, 200);
+        super("catapult", document.getElementById("background"), 0, 455, 400, 200);
         
         this.character = c;
         

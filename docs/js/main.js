@@ -22,9 +22,10 @@ var GameObject = (function () {
 var Background = (function (_super) {
     __extends(Background, _super);
     function Background(c) {
-        _super.call(this, "background", document.getElementById("container"), 0, 0, 10000, 720);
+        _super.call(this, "background", document.getElementById("container"), 0, 0, 50000, 720);
         this.div.setAttribute("id", "background");
         this.character = c;
+        this.catapult = new Catapult(this.character);
     }
     ;
     Background.prototype.move = function () {
@@ -43,7 +44,7 @@ var Catapult = (function (_super) {
     __extends(Catapult, _super);
     function Catapult(c) {
         var _this = this;
-        _super.call(this, "catapult", document.getElementById("background"), 0, 480, 400, 200);
+        _super.call(this, "catapult", document.getElementById("background"), 0, 455, 400, 200);
         this.character = c;
         this.click = function () { return _this.onClick(); };
         this.div.addEventListener("click", this.click);
@@ -60,9 +61,11 @@ var Catapult = (function (_super) {
 var Character = (function (_super) {
     __extends(Character, _super);
     function Character() {
-        _super.call(this, "character", document.getElementById("container"), 20, 520, 70, 70);
+        _super.call(this, "character", document.getElementById("container"), 20, 495, 70, 70);
+        this.observers = new Array();
         this.speed = 0;
         this.gravity = 0.5;
+        this.fuel = 10;
         this.speed = 3;
         this.x = 20;
         this.y = 520;
@@ -73,13 +76,42 @@ var Character = (function (_super) {
         this.state.move();
     };
     ;
+    Character.prototype.subscribe = function (o) {
+        this.observers.push(o);
+    };
+    Character.prototype.unsubscribe = function (o) {
+    };
     return Character;
 }(GameObject));
 ;
 ;
+var PowerUp = (function (_super) {
+    __extends(PowerUp, _super);
+    function PowerUp(tag, parent, x, y, width, height) {
+        _super.call(this, tag, parent, x, y, width, height);
+        this.observers = new Array();
+    }
+    PowerUp.prototype.move = function () {
+        this.div.style.transform = "translateX(" + this.x + "px)";
+    };
+    return PowerUp;
+}(GameObject));
+var Chopper = (function (_super) {
+    __extends(Chopper, _super);
+    function Chopper(x, s) {
+        _super.call(this, "chopper", document.getElementById("container"), x + (window.innerWidth / 2), Utils.getRandom(0, window.innerHeight - 200), 90, 35);
+        s.subscribe(this);
+        this.move();
+    }
+    Chopper.prototype.notify = function () {
+        console.log("chopper");
+    };
+    return Chopper;
+}(PowerUp));
 var Crashed = (function () {
     function Crashed(c) {
         this.character = c;
+        console.log(this.character.observers);
     }
     ;
     Crashed.prototype.move = function () {
@@ -107,30 +139,80 @@ var Flying = (function () {
         this.character.y += this.character.velocityY;
         this.character.velocityY += this.character.gravity;
         if (this.character.x >= 400) {
-            this.game.background.move();
+            this.game.bg1.move();
+            this.game.ground.move();
             this.character.velocityX = 0;
         }
         ;
         if (Utils.checkCollision(this.character, this.game.ground)) {
             this.character.state = new Crashed(this.character);
-            this.game.background.stop();
+            this.game.bg1.stop();
+            this.game.ground.move();
         }
         ;
+        if (this.character.y < 0) {
+            this.character.y = 0;
+            this.character.velocityY = 0;
+        }
         this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
+        var g = Game.getInstance();
+        for (var _i = 0; _i < g.wings.length; _i++) {
+            if (Utils.checkCollision(this.character, g.wings[_i])) {
+                console.log("collision");
+                this.character.fuel += 5;
+            }
+            ;
+        }
+        ;
+        for (var _i = 0; _i < g.choppers.length; _i++) {
+            if (Utils.checkCollision(this.character, g.choppers[_i])) {
+                console.log("collision");
+                this.character.fuel += 5;
+            }
+            ;
+        }
+        ;
+        for (var _i = 0; _i < g.shields.length; _i++) {
+            if (Utils.checkCollision(this.character, g.shields[_i])) {
+                console.log("collision");
+                this.character.fuel += 5;
+            }
+            ;
+        }
+        ;
     };
     ;
     Flying.prototype.onClick = function () {
-        this.character.velocityY = -15;
+        if (this.character.fuel > 0) {
+            this.character.velocityY = -15;
+        }
+        this.character.fuel--;
     };
     ;
     return Flying;
 }());
 ;
+var Fuel = (function (_super) {
+    __extends(Fuel, _super);
+    function Fuel() {
+        _super.call(this, "fuel", document.getElementById("container"), 20, 20, 50, 50);
+    }
+    return Fuel;
+}(GameObject));
 var Ground = (function (_super) {
     __extends(Ground, _super);
     function Ground() {
-        _super.call(this, "ground", document.getElementById("background"), 0, 615, 10000, 108);
+        _super.call(this, "ground", document.getElementById("container"), 0, 615, 50000, 108);
     }
+    ;
+    Ground.prototype.move = function () {
+        this.x -= 10;
+        this.div.style.transform = "translate(" + this.x + "px, 615px)";
+    };
+    ;
+    Ground.prototype.stop = function () {
+        this.div.style.transform = "translateX(" + this.x + "px)";
+    };
     ;
     return Ground;
 }(GameObject));
@@ -138,10 +220,19 @@ var Ground = (function (_super) {
 var Game = (function () {
     function Game() {
         var _this = this;
+        this.wings = new Array();
+        this.choppers = new Array();
+        this.shields = new Array();
+        this.counter = 0;
         this.character = new Character();
-        this.background = new Background(this.character);
+        this.bg1 = new Background(this.character);
         this.ground = new Ground();
-        this.catapult = new Catapult(this.character);
+        this.fuel = new Fuel();
+        for (var _i = 0, _a = this.wings; _i < _a.length; _i++) {
+            var w = _a[_i];
+            w.move();
+        }
+        this.timer = setInterval(function () { return _this.spawnPowerUp(); }, 2000);
         requestAnimationFrame(function () { return _this.gameLoop(); });
     }
     ;
@@ -149,6 +240,20 @@ var Game = (function () {
         var _this = this;
         this.character.move();
         requestAnimationFrame(function () { return _this.gameLoop(); });
+        this.counter = this.counter + 10;
+        for (var _i = 0, _a = this.choppers; _i < _a.length; _i++) {
+            var c = _a[_i];
+            c.move();
+        }
+        for (var _b = 0, _c = this.wings; _b < _c.length; _b++) {
+            var w = _c[_b];
+            w.move();
+        }
+        for (var _d = 0, _e = this.shields; _d < _e.length; _d++) {
+            var s = _e[_d];
+            s.move();
+        }
+        this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
     };
     ;
     Game.getInstance = function () {
@@ -159,15 +264,40 @@ var Game = (function () {
     };
     ;
     Game.prototype.gameOver = function () {
-        console.log("game over");
     };
     ;
+    Game.prototype.spawnPowerUp = function () {
+        var powerUpChoice = Math.floor((Math.random() * 3) + 1);
+        switch (powerUpChoice) {
+            case 1:
+                this.wings.push(new Wing(this.counter, this.character));
+                break;
+            case 2:
+                this.shields.push(new Shield(this.counter, this.character));
+                break;
+            case 3:
+                this.choppers.push(new Chopper(this.counter, this.character));
+                break;
+        }
+    };
     return Game;
 }());
 ;
 window.addEventListener("load", function () {
     var g = Game.getInstance();
 });
+var Shield = (function (_super) {
+    __extends(Shield, _super);
+    function Shield(x, s) {
+        _super.call(this, "shield", document.getElementById("container"), x + (window.innerWidth / 2), Utils.getRandom(0, window.innerHeight - 200), 100, 100);
+        s.subscribe(this);
+        this.move();
+    }
+    Shield.prototype.notify = function () {
+        console.log("shield");
+    };
+    return Shield;
+}(PowerUp));
 var Stationary = (function () {
     function Stationary(c) {
         this.character = c;
@@ -192,4 +322,16 @@ var Utils = (function () {
     };
     return Utils;
 }());
+var Wing = (function (_super) {
+    __extends(Wing, _super);
+    function Wing(x, s) {
+        _super.call(this, "wings", document.getElementById("container"), x + (window.innerWidth / 2), Utils.getRandom(0, window.innerHeight - 200), 50, 52);
+        s.subscribe(this);
+        this.move();
+    }
+    Wing.prototype.notify = function () {
+        console.log("wing");
+    };
+    return Wing;
+}(PowerUp));
 //# sourceMappingURL=main.js.map
