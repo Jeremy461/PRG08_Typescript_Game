@@ -1,3 +1,9 @@
+Link naar pull request:
+https://github.com/0909758/PRG08_Bobs_Nightmare/pull/2
+
+Link naar issue:
+https://github.com/0909758/PRG08_Bobs_Nightmare/issues/4
+
 Play the game:
 
 https://jeremy461.github.io/PRG08_Typescript_Game/
