@@ -10,7 +10,12 @@ class PowerUp extends GameObject {
     }
 
     public move(): void{
-        this.div.style.transform = "translateX("+ this.x +"px)";
+        this.x -= 10;
+        this.div.style.transform = "translate("+ this.x +"px, "+ this.y +"px)";
+    }
+
+    public stop(): void {
+        this.div.style.transform = "translate("+ this.x +"px, "+ this.y +")";
     }
     
 }

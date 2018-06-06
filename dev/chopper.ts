@@ -2,8 +2,8 @@
 
 
 class Chopper extends PowerUp implements Observer {
-    constructor(x: number, s: Subject){
-        super("chopper", document.getElementById("container"), x + (window.innerWidth / 2), Utils.getRandom(0, window.innerHeight - 200), 90, 35);
+    constructor(s: Subject){
+        super("chopper", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 90, 35);
     
         s.subscribe(this);
         this.move();
