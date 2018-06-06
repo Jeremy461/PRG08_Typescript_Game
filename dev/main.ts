@@ -15,6 +15,7 @@ class Game {
 
     private static instance: Game;
     private timer;
+    private loop;
     
     constructor() {
         this.character = new Character();
@@ -24,7 +25,7 @@ class Game {
         
         this.timer = setInterval(() => this.spawnPowerUp(), 2000);
  
-        requestAnimationFrame(() => this.gameLoop());
+        this.loop = requestAnimationFrame(() => this.gameLoop());
     };
 
     private gameLoop(){
@@ -54,7 +55,21 @@ class Game {
     };
     
     public gameOver(){
-        // console.log("game over");
+        clearInterval(this.timer);
+        for (var _i = 0; _i < this.shields.length; _i++) {
+            this.shields[_i].div.remove();
+            this.shields.splice(_i, 1);
+        };
+
+        for (var _i = 0; _i < this.wings.length; _i++) {
+            this.wings[_i].div.remove();
+            this.wings.splice(_i, 1);
+        };
+
+        for (var _i = 0; _i < this.choppers.length; _i++) {
+            this.choppers[_i].div.remove();
+            this.choppers.splice(_i, 1);
+        };
     };
 
     private spawnPowerUp(){

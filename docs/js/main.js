@@ -234,23 +234,23 @@ var Game = (function () {
         this.ground = new Ground();
         this.fuel = new Fuel();
         this.timer = setInterval(function () { return _this.spawnPowerUp(); }, 2000);
-        requestAnimationFrame(function () { return _this.gameLoop(); });
+        this.loop = requestAnimationFrame(function () { return _this.gameLoop(); });
     }
     ;
     Game.prototype.gameLoop = function () {
         var _this = this;
         this.character.move();
         requestAnimationFrame(function () { return _this.gameLoop(); });
-        for (var _i = 0, _a = this.choppers; _i < _a.length; _i++) {
-            var c = _a[_i];
+        for (var _a = 0, _b = this.choppers; _a < _b.length; _a++) {
+            var c = _b[_a];
             c.move();
         }
-        for (var _b = 0, _c = this.wings; _b < _c.length; _b++) {
-            var w = _c[_b];
+        for (var _c = 0, _d = this.wings; _c < _d.length; _c++) {
+            var w = _d[_c];
             w.move();
         }
-        for (var _d = 0, _e = this.shields; _d < _e.length; _d++) {
-            var s = _e[_d];
+        for (var _e = 0, _f = this.shields; _e < _f.length; _e++) {
+            var s = _f[_e];
             s.move();
         }
         this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
@@ -264,6 +264,22 @@ var Game = (function () {
     };
     ;
     Game.prototype.gameOver = function () {
+        clearInterval(this.timer);
+        for (var _i = 0; _i < this.shields.length; _i++) {
+            this.shields[_i].div.remove();
+            this.shields.splice(_i, 1);
+        }
+        ;
+        for (var _i = 0; _i < this.wings.length; _i++) {
+            this.wings[_i].div.remove();
+            this.wings.splice(_i, 1);
+        }
+        ;
+        for (var _i = 0; _i < this.choppers.length; _i++) {
+            this.choppers[_i].div.remove();
+            this.choppers.splice(_i, 1);
+        }
+        ;
     };
     ;
     Game.prototype.spawnPowerUp = function () {
