@@ -6,7 +6,6 @@ class Shield extends PowerUp implements Observer {
         super("shield", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200) , 100, 100);
 
         s.subscribe(this);
-        this.move();
     }
 
     public notify(){

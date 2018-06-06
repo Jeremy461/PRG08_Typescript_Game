@@ -105,7 +105,6 @@ var Chopper = (function (_super) {
     function Chopper(s) {
         _super.call(this, "chopper", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 90, 35);
         s.subscribe(this);
-        this.move();
     }
     Chopper.prototype.notify = function () {
         console.log("chopper");
@@ -162,7 +161,8 @@ var Flying = (function () {
         var g = Game.getInstance();
         for (var _i = 0; _i < g.wings.length; _i++) {
             if (Utils.checkCollision(this.character, g.wings[_i])) {
-                console.log("collision");
+                g.wings[_i].div.remove();
+                g.wings.splice(_i, 1);
                 this.character.fuel += 5;
             }
             ;
@@ -170,7 +170,8 @@ var Flying = (function () {
         ;
         for (var _i = 0; _i < g.choppers.length; _i++) {
             if (Utils.checkCollision(this.character, g.choppers[_i])) {
-                console.log("collision");
+                g.choppers[_i].div.remove();
+                g.choppers.splice(_i, 1);
                 this.character.fuel += 5;
             }
             ;
@@ -178,7 +179,8 @@ var Flying = (function () {
         ;
         for (var _i = 0; _i < g.shields.length; _i++) {
             if (Utils.checkCollision(this.character, g.shields[_i])) {
-                console.log("collision");
+                g.shields[_i].div.remove();
+                g.shields.splice(_i, 1);
                 this.character.fuel += 5;
             }
             ;
@@ -292,7 +294,6 @@ var Shield = (function (_super) {
     function Shield(s) {
         _super.call(this, "shield", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 100, 100);
         s.subscribe(this);
-        this.move();
     }
     Shield.prototype.notify = function () {
         console.log("shield");
@@ -328,7 +329,6 @@ var Wing = (function (_super) {
     function Wing(s) {
         _super.call(this, "wings", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 50, 52);
         s.subscribe(this);
-        this.move();
     }
     Wing.prototype.notify = function () {
         console.log("wing");

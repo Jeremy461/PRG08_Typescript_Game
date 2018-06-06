@@ -44,24 +44,24 @@ class Flying implements CharacterStates {
         let g = Game.getInstance();
         for (var _i = 0; _i < g.wings.length; _i++) {
             if(Utils.checkCollision(this.character, g.wings[_i])){
-                console.log("collision");   
-                // g.wings.splice(_i, 1);
+                g.wings[_i].div.remove();
+                g.wings.splice(_i, 1);
                 this.character.fuel += 5;
             };
         };
 
         for (var _i = 0; _i < g.choppers.length; _i++) {
             if(Utils.checkCollision(this.character, g.choppers[_i])){
-                console.log("collision");
-                // g.choppers.splice(_i, 1);
+                g.choppers[_i].div.remove();
+                g.choppers.splice(_i, 1);
                 this.character.fuel += 5;
             };
         };
 
         for (var _i = 0; _i < g.shields.length; _i++) {
             if(Utils.checkCollision(this.character, g.shields[_i])){
-                console.log("collision");
-                // g.shields.splice(_i, 1);
+                g.shields[_i].div.remove();
+                g.shields.splice(_i, 1);
                 this.character.fuel += 5;
             };
         };
