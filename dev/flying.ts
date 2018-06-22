@@ -15,11 +15,11 @@ class Flying implements CharacterStates {
             this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
         } else {
             this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")"; 
-        }
+        };
         
         this.container = document.getElementById("container");
         this.click = () => this.onClick();
-        this.container.addEventListener("click", this.click);
+        this.container.addEventListener("mousedown", this.click);
     };
     
     public move(): void{
@@ -45,7 +45,7 @@ class Flying implements CharacterStates {
             } else {
                 this.character.state = new Crashed(this.character);
                 this.game.gameOver();               
-            }
+            };
         };
         
         this.character.div.style.transform = "translate("+ this.character.x +"px, "+ this.character.y +"px)";
@@ -62,7 +62,7 @@ class Flying implements CharacterStates {
             if(Utils.checkCollision(this.character, this.game.choppers[_i])){
                 this.game.choppers[_i].div.remove();
                 this.game.choppers.splice(_i, 1);
-                this.container.removeEventListener("click", this.click);
+                this.container.removeEventListener("mousedown", this.click);
                 this.character.state = new ChopperState(this.character);
             };
         };
@@ -75,13 +75,21 @@ class Flying implements CharacterStates {
                 this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
             };
         };
+
+        for (var _i = 0; _i < this.game.supers.length; _i++) {
+            if(Utils.checkCollision(this.character, this.game.supers[_i])){
+                this.game.supers[_i].div.remove();
+                this.game.supers[_i].notifyObservers();
+                this.game.supers.splice(_i, 1);
+            };
+        };
         
     };
     
     private onClick(): void{
         if(this.character.fuel > 0){
             this.character.velocityY = -15;
-        }
+        };
         this.character.fuel--;
     };
 };

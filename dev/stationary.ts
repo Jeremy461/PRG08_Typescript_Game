@@ -9,4 +9,4 @@ class Stationary implements CharacterStates {
     public move(): void{
         
     };
-}
+};

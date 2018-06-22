@@ -55,17 +55,20 @@ fuel {
 shield {
     background-image: url("../images/shield.png");
     background-size: cover;
-    /*z-index: 1;*/
 }
 
 chopper {
     background-image: url("../images/propellercap.png");
     background-size: cover;
-    /*z-index: 1;*/
 }
 
 wings {
     background-image: url("../images/wings.png");
     background-size: cover;
-    /*z-index: 1;*/
+}
+
+super {
+    background-image: url("../images/superMushroom.png");
+    background-size: cover;
+    z-index: 20;
 }

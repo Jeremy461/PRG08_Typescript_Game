@@ -6,9 +6,10 @@ class Chopper extends PowerUp implements Observer {
         super("chopper", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 90, 35);
     
         s.subscribe(this);
-    }
+    };
 
     public notify(){
-        console.log("chopper");
-    }
-}
+        this.div.style.width = '180px';
+        this.div.style.height = '70px';
+    };
+};

@@ -4,7 +4,6 @@ class Crashed implements CharacterStates {
     
     constructor(c: Character) {
         this.character = c;
-        console.log(this.character.observers);
     };
     
     public move(): void{

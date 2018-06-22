@@ -62,7 +62,6 @@ var Character = (function (_super) {
     __extends(Character, _super);
     function Character() {
         _super.call(this, "character", document.getElementById("container"), 20, 495, 70, 70);
-        this.observers = new Array();
         this.speed = 0;
         this.gravity = 0.5;
         this.fuel = 10;
@@ -77,11 +76,6 @@ var Character = (function (_super) {
         this.state.move();
     };
     ;
-    Character.prototype.subscribe = function (o) {
-        this.observers.push(o);
-    };
-    Character.prototype.unsubscribe = function (o) {
-    };
     return Character;
 }(GameObject));
 ;
@@ -92,26 +86,34 @@ var PowerUp = (function (_super) {
         _super.call(this, tag, parent, x, y, width, height);
         this.observers = new Array();
     }
+    ;
     PowerUp.prototype.move = function () {
         this.x -= 10;
         this.div.style.transform = "translate(" + this.x + "px, " + this.y + "px)";
     };
+    ;
     PowerUp.prototype.stop = function () {
         this.div.style.transform = "translate(" + this.x + "px, " + this.y + ")";
     };
+    ;
     return PowerUp;
 }(GameObject));
+;
 var Chopper = (function (_super) {
     __extends(Chopper, _super);
     function Chopper(s) {
         _super.call(this, "chopper", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 90, 35);
         s.subscribe(this);
     }
+    ;
     Chopper.prototype.notify = function () {
-        console.log("chopper");
+        this.div.style.width = '180px';
+        this.div.style.height = '70px';
     };
+    ;
     return Chopper;
 }(PowerUp));
+;
 var ChopperState = (function () {
     function ChopperState(c) {
         this.timer = 0;
@@ -144,7 +146,6 @@ var ChopperState = (function () {
 var Crashed = (function () {
     function Crashed(c) {
         this.character = c;
-        console.log(this.character.observers);
     }
     ;
     Crashed.prototype.move = function () {
@@ -166,9 +167,10 @@ var Flying = (function () {
         else {
             this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
         }
+        ;
         this.container = document.getElementById("container");
         this.click = function () { return _this.onClick(); };
-        this.container.addEventListener("click", this.click);
+        this.container.addEventListener("mousedown", this.click);
     }
     ;
     Flying.prototype.move = function () {
@@ -194,6 +196,7 @@ var Flying = (function () {
                 this.character.state = new Crashed(this.character);
                 this.game.gameOver();
             }
+            ;
         }
         ;
         this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
@@ -210,7 +213,7 @@ var Flying = (function () {
             if (Utils.checkCollision(this.character, this.game.choppers[_i])) {
                 this.game.choppers[_i].div.remove();
                 this.game.choppers.splice(_i, 1);
-                this.container.removeEventListener("click", this.click);
+                this.container.removeEventListener("mousedown", this.click);
                 this.character.state = new ChopperState(this.character);
             }
             ;
@@ -226,12 +229,22 @@ var Flying = (function () {
             ;
         }
         ;
+        for (var _i = 0; _i < this.game.supers.length; _i++) {
+            if (Utils.checkCollision(this.character, this.game.supers[_i])) {
+                this.game.supers[_i].div.remove();
+                this.game.supers[_i].notifyObservers();
+                this.game.supers.splice(_i, 1);
+            }
+            ;
+        }
+        ;
     };
     ;
     Flying.prototype.onClick = function () {
         if (this.character.fuel > 0) {
             this.character.velocityY = -15;
         }
+        ;
         this.character.fuel--;
     };
     ;
@@ -243,8 +256,10 @@ var Fuel = (function (_super) {
     function Fuel() {
         _super.call(this, "fuel", document.getElementById("container"), 20, 20, 50, 50);
     }
+    ;
     return Fuel;
 }(GameObject));
+;
 var Ground = (function (_super) {
     __extends(Ground, _super);
     function Ground() {
@@ -269,11 +284,14 @@ var Game = (function () {
         this.wings = new Array();
         this.choppers = new Array();
         this.shields = new Array();
+        this.supers = new Array();
         this.character = new Character();
         this.bg1 = new Background(this.character);
         this.ground = new Ground();
         this.fuel = new Fuel();
-        this.timer = setInterval(function () { return _this.spawnPowerUp(); }, 2000);
+        this.supers.push(new Super());
+        this.supers[0].div.style.transform = "translateX(1500px, 615px)";
+        this.timer = setInterval(function () { return _this.spawnPowerUp(); }, 1500);
         this.loop = requestAnimationFrame(function () { return _this.gameLoop(); });
     }
     ;
@@ -295,6 +313,7 @@ var Game = (function () {
         if (!Game.instance) {
             Game.instance = new Game();
         }
+        ;
         return Game.instance;
     };
     ;
@@ -303,15 +322,24 @@ var Game = (function () {
             var c = _b[_a];
             c.move();
         }
+        ;
         for (var _c = 0, _d = this.wings; _c < _d.length; _c++) {
             var w = _d[_c];
             w.move();
         }
+        ;
         for (var _e = 0, _f = this.shields; _e < _f.length; _e++) {
             var s = _f[_e];
             s.move();
         }
+        ;
+        for (var _g = 0, _h = this.supers.slice(1); _g < _h.length; _g++) {
+            var mushroom = _h[_g];
+            mushroom.move();
+        }
+        ;
     };
+    ;
     Game.prototype.gameOver = function () {
         clearInterval(this.timer);
         this.bg1.stop();
@@ -331,42 +359,64 @@ var Game = (function () {
             this.choppers.splice(_i, 1);
         }
         ;
+        for (var _i = 0; _i < this.supers.length; _i++) {
+            this.supers[_i].div.remove();
+            this.supers.splice(_i, 1);
+        }
+        ;
     };
     ;
     Game.prototype.spawnPowerUp = function () {
-        var powerUpChoice = Math.floor((Math.random() * 3) + 1);
+        var powerUpChoice = Math.floor((Math.random() * 12) + 1);
         switch (powerUpChoice) {
             case 1:
-                console.log("new Wing");
-                this.wings.push(new Wing(this.character));
-                break;
             case 2:
-                console.log("new Shield");
-                this.shields.push(new Shield(this.character));
-                break;
             case 3:
+                console.log("new Wing");
+                this.wings.push(new Wing(this.supers[this.supers.length - 1]));
+                break;
+            case 4:
+            case 5:
+            case 6:
+                console.log("new Shield");
+                this.shields.push(new Shield(this.supers[this.supers.length - 1]));
+                break;
+            case 7:
+            case 8:
+            case 9:
                 console.log("new Chopper");
-                this.choppers.push(new Chopper(this.character));
+                this.choppers.push(new Chopper(this.supers[this.supers.length - 1]));
+                break;
+            case 10:
+                console.log("new Super");
+                this.supers.push(new Super());
                 break;
         }
+        ;
     };
+    ;
     return Game;
 }());
 ;
 window.addEventListener("load", function () {
     var g = Game.getInstance();
 });
+;
 var Shield = (function (_super) {
     __extends(Shield, _super);
     function Shield(s) {
         _super.call(this, "shield", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 100, 100);
         s.subscribe(this);
     }
+    ;
     Shield.prototype.notify = function () {
-        console.log("shield");
+        this.div.style.width = '200px';
+        this.div.style.height = '200px';
     };
+    ;
     return Shield;
 }(PowerUp));
+;
 var Stationary = (function () {
     function Stationary(c) {
         this.character = c;
@@ -377,6 +427,39 @@ var Stationary = (function () {
     ;
     return Stationary;
 }());
+;
+;
+var Super = (function (_super) {
+    __extends(Super, _super);
+    function Super() {
+        _super.call(this, "super", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 73, 65);
+        this.observers = new Array();
+        this.observers = [];
+    }
+    ;
+    Super.prototype.subscribe = function (o) {
+        this.observers.push(o);
+    };
+    ;
+    Super.prototype.unsubscribe = function (o) {
+    };
+    ;
+    Super.prototype.notifyObservers = function () {
+        for (var _i = 0, _a = this.observers; _i < _a.length; _i++) {
+            var o = _a[_i];
+            o.notify();
+        }
+        ;
+    };
+    ;
+    Super.prototype.move = function () {
+        this.x -= 10;
+        this.div.style.transform = "translate(" + this.x + "px, " + this.y + "px)";
+    };
+    ;
+    return Super;
+}(PowerUp));
+;
 var Utils = (function () {
     function Utils() {
     }
@@ -386,20 +469,29 @@ var Utils = (function () {
             n.y < m.y + m.height &&
             n.height + n.y > m.y);
     };
+    ;
     Utils.getRandom = function (min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     };
+    ;
     return Utils;
 }());
+;
 var Wing = (function (_super) {
     __extends(Wing, _super);
     function Wing(s) {
         _super.call(this, "wings", document.getElementById("container"), Utils.getRandom(0, window.innerWidth) + window.innerWidth, Utils.getRandom(0, window.innerHeight - 200), 50, 52);
         s.subscribe(this);
     }
+    ;
     Wing.prototype.notify = function () {
-        console.log("wing");
+        console.log('wings notify:');
+        console.log(this.div.style.width);
+        this.div.style.width = '100px';
+        this.div.style.height = '100px';
     };
+    ;
     return Wing;
 }(PowerUp));
+;
 //# sourceMappingURL=main.js.map
