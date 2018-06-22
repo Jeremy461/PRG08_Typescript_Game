@@ -11,7 +11,11 @@ class Flying implements CharacterStates {
         this.game = Game.getInstance();
         this.character.velocityY = -15;
         this.character.velocityX = 10;
-        this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
+        if(this.character.shielded) {
+            this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
+        } else {
+            this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")"; 
+        }
         
         this.container = document.getElementById("container");
         this.click = () => this.onClick();
@@ -30,8 +34,18 @@ class Flying implements CharacterStates {
         };
 
         if(Utils.checkCollision(this.character, this.game.ground)){
-            this.character.state = new Crashed(this.character);
-            this.game.gameOver();
+            if(this.character.shielded) {
+                this.character.velocityY = -15;
+                let _this = this;
+                setTimeout(function() {
+                    _this.character.shielded = false;
+                    console.log('shield off');
+                }, 200);
+                this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
+            } else {
+                this.character.state = new Crashed(this.character);
+                this.game.gameOver();               
+            }
         };
         
         this.character.div.style.transform = "translate("+ this.character.x +"px, "+ this.character.y +"px)";
@@ -57,7 +71,8 @@ class Flying implements CharacterStates {
             if(Utils.checkCollision(this.character, this.game.shields[_i])){
                 this.game.shields[_i].div.remove();
                 this.game.shields.splice(_i, 1);
-                this.character.fuel += 5;
+                this.character.shielded = true;
+                this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
             };
         };
         

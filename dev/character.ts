@@ -10,6 +10,7 @@ class Character extends GameObject implements Subject {
     public gravity: number = 0.5;
     public velocityY: number; public velocityX: number;
     public fuel: number = 10;
+    public shielded: boolean = false;
     
     constructor(){
         super("character", document.getElementById("container"), 20, 495, 70, 70);
