@@ -10,7 +10,7 @@ class Ground extends GameObject {
     };
     
     public stop(): void{
-        this.div.style.transform = "translateX("+ this.x +"px)";
+        this.div.style.transform = "translateX("+ this.x +"px, 615px)";
     };
     
 };

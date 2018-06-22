@@ -3,6 +3,7 @@ class Flying implements CharacterStates {
     private character: Character;
     private click: EventListener;
     private game: Game;
+    private container: HTMLElement;
     
     constructor(c: Character) {
         
@@ -10,10 +11,11 @@ class Flying implements CharacterStates {
         this.game = Game.getInstance();
         this.character.velocityY = -15;
         this.character.velocityX = 10;
+        this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
         
-        let container = document.getElementById("container");
+        this.container = document.getElementById("container");
         this.click = () => this.onClick();
-        container.addEventListener("click", this.click);
+        this.container.addEventListener("click", this.click);
     };
     
     public move(): void{
@@ -22,46 +24,39 @@ class Flying implements CharacterStates {
         this.character.y += this.character.velocityY;
         this.character.velocityY += this.character.gravity;
         
-        if(this.character.x >= 400){
-            this.game.bg1.move();         
-            this.game.ground.move();  
-            this.character.velocityX = 0;
-        };
-        
-        if(Utils.checkCollision(this.character, this.game.ground)){
-            this.character.state = new Crashed(this.character);
-            this.game.bg1.stop();
-            this.game.ground.move();
-        };
-        
         if(this.character.y < 0){
             this.character.y = 0;
             this.character.velocityY = 0;
-        }
+        };
+
+        if(Utils.checkCollision(this.character, this.game.ground)){
+            this.character.state = new Crashed(this.character);
+            this.game.gameOver();
+        };
         
         this.character.div.style.transform = "translate("+ this.character.x +"px, "+ this.character.y +"px)";
 
-        let g = Game.getInstance();
-        for (var _i = 0; _i < g.wings.length; _i++) {
-            if(Utils.checkCollision(this.character, g.wings[_i])){
-                g.wings[_i].div.remove();
-                g.wings.splice(_i, 1);
+        for (var _i = 0; _i < this.game.wings.length; _i++) {
+            if(Utils.checkCollision(this.character, this.game.wings[_i])){
+                this.game.wings[_i].div.remove();
+                this.game.wings.splice(_i, 1);
                 this.character.fuel += 5;
             };
         };
 
-        for (var _i = 0; _i < g.choppers.length; _i++) {
-            if(Utils.checkCollision(this.character, g.choppers[_i])){
-                g.choppers[_i].div.remove();
-                g.choppers.splice(_i, 1);
-                this.character.fuel += 5;
+        for (var _i = 0; _i < this.game.choppers.length; _i++) {
+            if(Utils.checkCollision(this.character, this.game.choppers[_i])){
+                this.game.choppers[_i].div.remove();
+                this.game.choppers.splice(_i, 1);
+                this.container.removeEventListener("click", this.click);
+                this.character.state = new ChopperState(this.character);
             };
         };
 
-        for (var _i = 0; _i < g.shields.length; _i++) {
-            if(Utils.checkCollision(this.character, g.shields[_i])){
-                g.shields[_i].div.remove();
-                g.shields.splice(_i, 1);
+        for (var _i = 0; _i < this.game.shields.length; _i++) {
+            if(Utils.checkCollision(this.character, this.game.shields[_i])){
+                this.game.shields[_i].div.remove();
+                this.game.shields.splice(_i, 1);
                 this.character.fuel += 5;
             };
         };

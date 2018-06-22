@@ -8,8 +8,6 @@ class Crashed implements CharacterStates {
     };
     
     public move(): void{
-        
-        let g = Game.getInstance();
-        g.gameOver();
+
     };
 };

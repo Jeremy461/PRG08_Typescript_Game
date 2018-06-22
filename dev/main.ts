@@ -31,7 +31,24 @@ class Game {
     private gameLoop(){
         this.character.move();
         requestAnimationFrame(() => this.gameLoop());
+        this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
+                
+        if(this.character.x >= 400 && !Utils.checkCollision(this.character, this.ground)){
+            this.bg1.move();         
+            this.ground.move();
+            this.movePowerups();
+            this.character.velocityX = 0;
+        };
+    };
+    
+    public static getInstance() {
+        if (!Game.instance) {
+            Game.instance = new Game();
+        }
+        return Game.instance;
+    };
 
+    public movePowerups() {
         for ( let c of this.choppers ) {
             c.move();
         }
@@ -43,19 +60,14 @@ class Game {
         for ( let s of this.shields ) {
             s.move();
         }
-
-        this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
-    };
-    
-    public static getInstance() {
-        if (!Game.instance) {
-            Game.instance = new Game();
-        }
-        return Game.instance;
-    };
+    }
     
     public gameOver(){
         clearInterval(this.timer);
+
+        this.bg1.stop();
+        this.ground.stop();
+
         for (var _i = 0; _i < this.shields.length; _i++) {
             this.shields[_i].div.remove();
             this.shields.splice(_i, 1);

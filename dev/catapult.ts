@@ -21,5 +21,4 @@ class Catapult extends GameObject {
         this.div.removeEventListener("click", this.click);
     };
     
-    
 };

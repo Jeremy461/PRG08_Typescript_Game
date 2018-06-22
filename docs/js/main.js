@@ -111,6 +111,35 @@ var Chopper = (function (_super) {
     };
     return Chopper;
 }(PowerUp));
+var ChopperState = (function () {
+    function ChopperState(c) {
+        this.timer = 0;
+        this.character = c;
+        this.game = Game.getInstance();
+        this.character.velocityY = -5;
+        this.character.velocityX = 10;
+        this.character.div.style.backgroundImage = "url(\"../docs/images/characterChopper.png\")";
+    }
+    ;
+    ChopperState.prototype.move = function () {
+        this.timer++;
+        this.character.x += this.character.velocityX;
+        this.character.y += this.character.velocityY;
+        if (this.character.y < 0) {
+            this.character.y = 0;
+            this.character.velocityY = 0;
+        }
+        ;
+        if (this.timer > 150) {
+            this.character.state = new Flying(this.character);
+        }
+        ;
+        this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
+    };
+    ;
+    return ChopperState;
+}());
+;
 var Crashed = (function () {
     function Crashed(c) {
         this.character = c;
@@ -118,8 +147,6 @@ var Crashed = (function () {
     }
     ;
     Crashed.prototype.move = function () {
-        var g = Game.getInstance();
-        g.gameOver();
     };
     ;
     return Crashed;
@@ -132,55 +159,50 @@ var Flying = (function () {
         this.game = Game.getInstance();
         this.character.velocityY = -15;
         this.character.velocityX = 10;
-        var container = document.getElementById("container");
+        this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
+        this.container = document.getElementById("container");
         this.click = function () { return _this.onClick(); };
-        container.addEventListener("click", this.click);
+        this.container.addEventListener("click", this.click);
     }
     ;
     Flying.prototype.move = function () {
         this.character.x += this.character.velocityX;
         this.character.y += this.character.velocityY;
         this.character.velocityY += this.character.gravity;
-        if (this.character.x >= 400) {
-            this.game.bg1.move();
-            this.game.ground.move();
-            this.character.velocityX = 0;
-        }
-        ;
-        if (Utils.checkCollision(this.character, this.game.ground)) {
-            this.character.state = new Crashed(this.character);
-            this.game.bg1.stop();
-            this.game.ground.move();
-        }
-        ;
         if (this.character.y < 0) {
             this.character.y = 0;
             this.character.velocityY = 0;
         }
+        ;
+        if (Utils.checkCollision(this.character, this.game.ground)) {
+            this.character.state = new Crashed(this.character);
+            this.game.gameOver();
+        }
+        ;
         this.character.div.style.transform = "translate(" + this.character.x + "px, " + this.character.y + "px)";
-        var g = Game.getInstance();
-        for (var _i = 0; _i < g.wings.length; _i++) {
-            if (Utils.checkCollision(this.character, g.wings[_i])) {
-                g.wings[_i].div.remove();
-                g.wings.splice(_i, 1);
+        for (var _i = 0; _i < this.game.wings.length; _i++) {
+            if (Utils.checkCollision(this.character, this.game.wings[_i])) {
+                this.game.wings[_i].div.remove();
+                this.game.wings.splice(_i, 1);
                 this.character.fuel += 5;
             }
             ;
         }
         ;
-        for (var _i = 0; _i < g.choppers.length; _i++) {
-            if (Utils.checkCollision(this.character, g.choppers[_i])) {
-                g.choppers[_i].div.remove();
-                g.choppers.splice(_i, 1);
-                this.character.fuel += 5;
+        for (var _i = 0; _i < this.game.choppers.length; _i++) {
+            if (Utils.checkCollision(this.character, this.game.choppers[_i])) {
+                this.game.choppers[_i].div.remove();
+                this.game.choppers.splice(_i, 1);
+                this.container.removeEventListener("click", this.click);
+                this.character.state = new ChopperState(this.character);
             }
             ;
         }
         ;
-        for (var _i = 0; _i < g.shields.length; _i++) {
-            if (Utils.checkCollision(this.character, g.shields[_i])) {
-                g.shields[_i].div.remove();
-                g.shields.splice(_i, 1);
+        for (var _i = 0; _i < this.game.shields.length; _i++) {
+            if (Utils.checkCollision(this.character, this.game.shields[_i])) {
+                this.game.shields[_i].div.remove();
+                this.game.shields.splice(_i, 1);
                 this.character.fuel += 5;
             }
             ;
@@ -217,7 +239,7 @@ var Ground = (function (_super) {
     };
     ;
     Ground.prototype.stop = function () {
-        this.div.style.transform = "translateX(" + this.x + "px)";
+        this.div.style.transform = "translateX(" + this.x + "px, 615px)";
     };
     ;
     return Ground;
@@ -241,6 +263,24 @@ var Game = (function () {
         var _this = this;
         this.character.move();
         requestAnimationFrame(function () { return _this.gameLoop(); });
+        this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
+        if (this.character.x >= 400 && !Utils.checkCollision(this.character, this.ground)) {
+            this.bg1.move();
+            this.ground.move();
+            this.movePowerups();
+            this.character.velocityX = 0;
+        }
+        ;
+    };
+    ;
+    Game.getInstance = function () {
+        if (!Game.instance) {
+            Game.instance = new Game();
+        }
+        return Game.instance;
+    };
+    ;
+    Game.prototype.movePowerups = function () {
         for (var _a = 0, _b = this.choppers; _a < _b.length; _a++) {
             var c = _b[_a];
             c.move();
@@ -253,18 +293,11 @@ var Game = (function () {
             var s = _f[_e];
             s.move();
         }
-        this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
     };
-    ;
-    Game.getInstance = function () {
-        if (!Game.instance) {
-            Game.instance = new Game();
-        }
-        return Game.instance;
-    };
-    ;
     Game.prototype.gameOver = function () {
         clearInterval(this.timer);
+        this.bg1.stop();
+        this.ground.stop();
         for (var _i = 0; _i < this.shields.length; _i++) {
             this.shields[_i].div.remove();
             this.shields.splice(_i, 1);
