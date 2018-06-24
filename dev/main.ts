@@ -71,7 +71,7 @@ class Game {
     public gameOver(){
         clearInterval(this.timer);
 
-        this.bg1.stop();
+        this.background.stop();
         this.ground.stop();
 
         for (var _i = 0; _i < this.shields.length; _i++) {
