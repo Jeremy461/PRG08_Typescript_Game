@@ -10,6 +10,7 @@ https://jeremy461.github.io/PRG08_Typescript_Game/
 Eisen:
 
 Klassendiagram:
+![UML](UML-PRG08.png?raw=true "UML")
 
 Singleton:
 De singleton is toegepast in de main.ts. Deze Game class heeft een "private static instance Game" die opgevraagd/aangemaakt wordt door middel van de getInstance() method. Hierdoor kan ik vanuit andere classes de juiste instantie van de Game opvragen om methods/properties aan te spreken.
