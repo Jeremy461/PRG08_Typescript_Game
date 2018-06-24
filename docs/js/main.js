@@ -121,7 +121,7 @@ var ChopperState = (function () {
         this.game = Game.getInstance();
         this.character.velocityY = -5;
         this.character.velocityX = 10;
-        this.character.div.style.backgroundImage = "url(\"../docs/images/characterChopper.png\")";
+        this.character.div.classList.add('chopper');
     }
     ;
     ChopperState.prototype.move = function () {
@@ -134,6 +134,7 @@ var ChopperState = (function () {
         }
         ;
         if (this.timer > 150) {
+            this.character.div.classList.remove('chopper');
             this.character.state = new Flying(this.character);
         }
         ;
@@ -162,10 +163,7 @@ var Flying = (function () {
         this.character.velocityY = -15;
         this.character.velocityX = 10;
         if (this.character.shielded) {
-            this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
-        }
-        else {
-            this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
+            this.character.div.classList.add('shielded');
         }
         ;
         this.container = document.getElementById("container");
@@ -184,13 +182,13 @@ var Flying = (function () {
         ;
         if (Utils.checkCollision(this.character, this.game.ground)) {
             if (this.character.shielded) {
-                this.character.velocityY = -15;
+                this.character.velocityY = -20;
                 var _this_1 = this;
                 setTimeout(function () {
                     _this_1.character.shielded = false;
                     console.log('shield off');
                 }, 200);
-                this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
+                this.character.div.classList.remove('shielded');
             }
             else {
                 this.character.state = new Crashed(this.character);
@@ -224,7 +222,7 @@ var Flying = (function () {
                 this.game.shields[_i].div.remove();
                 this.game.shields.splice(_i, 1);
                 this.character.shielded = true;
-                this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
+                this.character.div.classList.add('shielded');
             }
             ;
         }

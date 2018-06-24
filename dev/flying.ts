@@ -12,9 +12,7 @@ class Flying implements CharacterStates {
         this.character.velocityY = -15;
         this.character.velocityX = 10;
         if(this.character.shielded) {
-            this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
-        } else {
-            this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")"; 
+            this.character.div.classList.add('shielded');
         };
         
         this.container = document.getElementById("container");
@@ -35,13 +33,13 @@ class Flying implements CharacterStates {
 
         if(Utils.checkCollision(this.character, this.game.ground)){
             if(this.character.shielded) {
-                this.character.velocityY = -15;
+                this.character.velocityY = -20;
                 let _this = this;
                 setTimeout(function() {
                     _this.character.shielded = false;
                     console.log('shield off');
                 }, 200);
-                this.character.div.style.backgroundImage = "url(\"../docs/images/character.png\")";
+                this.character.div.classList.remove('shielded');
             } else {
                 this.character.state = new Crashed(this.character);
                 this.game.gameOver();               
@@ -72,7 +70,7 @@ class Flying implements CharacterStates {
                 this.game.shields[_i].div.remove();
                 this.game.shields.splice(_i, 1);
                 this.character.shielded = true;
-                this.character.div.style.backgroundImage = "url(\"../docs/images/characterShield.png\")";
+                this.character.div.classList.add('shielded');
             };
         };
 

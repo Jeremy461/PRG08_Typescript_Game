@@ -40,6 +40,14 @@ character {
     background-size: cover;
 }
 
+.shielded {
+    background-image: url("../images/characterShield.png") !important;
+}
+
+.chopper {
+    background-image: url("../images/characterChopper.png") !important;
+}
+
 background {
     background-image: url("../images/background.jpg");
     background-repeat: repeat-x;

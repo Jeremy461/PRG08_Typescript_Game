@@ -9,7 +9,7 @@ class ChopperState implements CharacterStates {
         this.game = Game.getInstance();
         this.character.velocityY = -5;
         this.character.velocityX = 10;
-        this.character.div.style.backgroundImage = "url(\"../docs/images/characterChopper.png\")";
+        this.character.div.classList.add('chopper');
     };
     
     public move(): void{
@@ -23,6 +23,7 @@ class ChopperState implements CharacterStates {
         };
 
         if(this.timer > 150) {
+            this.character.div.classList.remove('chopper');
             this.character.state = new Flying(this.character);
         };
 
