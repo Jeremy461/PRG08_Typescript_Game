@@ -5,8 +5,7 @@ class Game {
     
     public ground: Ground;
     private character: Character;
-    public bg1: Background;
-    public bg2: Background;
+    public background: Background;
     private fuel: Fuel;
 
     public wings: Array<Wing> = new Array<Wing>();
@@ -20,7 +19,7 @@ class Game {
     
     constructor() {
         this.character = new Character();
-        this.bg1 = new Background(this.character);
+        this.background = new Background(this.character);
         this.ground = new Ground();
         this.fuel = new Fuel();
         this.supers.push(new Super());
@@ -37,7 +36,7 @@ class Game {
         this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
                 
         if(this.character.x >= 400 && !Utils.checkCollision(this.character, this.ground)){
-            this.bg1.move();         
+            this.background.move();         
             this.ground.move();
             this.movePowerups();
             this.character.velocityX = 0;

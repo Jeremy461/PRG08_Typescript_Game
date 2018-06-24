@@ -41,7 +41,7 @@ class Flying implements CharacterStates {
                 }, 200);
                 this.character.div.classList.remove('shielded');
             } else {
-                this.character.state = new Crashed(this.character);
+                this.character.state = new Stationary(this.character);
                 this.game.gameOver();               
             };
         };

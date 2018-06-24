@@ -144,17 +144,6 @@ var ChopperState = (function () {
     return ChopperState;
 }());
 ;
-var Crashed = (function () {
-    function Crashed(c) {
-        this.character = c;
-    }
-    ;
-    Crashed.prototype.move = function () {
-    };
-    ;
-    return Crashed;
-}());
-;
 var Flying = (function () {
     function Flying(c) {
         var _this = this;
@@ -191,7 +180,7 @@ var Flying = (function () {
                 this.character.div.classList.remove('shielded');
             }
             else {
-                this.character.state = new Crashed(this.character);
+                this.character.state = new Stationary(this.character);
                 this.game.gameOver();
             }
             ;
@@ -284,7 +273,7 @@ var Game = (function () {
         this.shields = new Array();
         this.supers = new Array();
         this.character = new Character();
-        this.bg1 = new Background(this.character);
+        this.background = new Background(this.character);
         this.ground = new Ground();
         this.fuel = new Fuel();
         this.supers.push(new Super());
@@ -299,7 +288,7 @@ var Game = (function () {
         requestAnimationFrame(function () { return _this.gameLoop(); });
         this.fuel.div.style.width = this.character.fuel * 49.5 + "px";
         if (this.character.x >= 400 && !Utils.checkCollision(this.character, this.ground)) {
-            this.bg1.move();
+            this.background.move();
             this.ground.move();
             this.movePowerups();
             this.character.velocityX = 0;
