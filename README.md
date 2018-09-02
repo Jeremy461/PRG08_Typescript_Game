@@ -5,7 +5,7 @@ Link naar issue:
 https://github.com/0909758/PRG08_Bobs_Nightmare/issues/4
 
 Link naar online versie:
-https://jeremy461.github.io/PRG08_Typescript_Game/
+https://jeremy461.github.io/PRG08_Typescript_game/
 
 Eisen:
 
